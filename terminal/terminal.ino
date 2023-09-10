@@ -6,20 +6,21 @@ char* commandDelimiter = " ,=";   // Breaking up commands, accept a space, a com
 unsigned char whiteSpace = 0x20;  // White space
 bool packetDetected = 0;          // Flag for detecting a packet
 
-String firmwareVersion = "v1.1a"; // Hard coded firmware version
+String firmwareVersion = "v1.2a"; // Hard coded firmware version
 
-// Our list of commands
+// Our commands
 String command_firmwareVersion = "ver";
 String command_settingsA = "settingA";
 String command_settingsB = "settingB";
 String command_taskA = "taskA";
 String command_taskB = "taskB";
 
-// Our list of responses
+// Our responses
 String response_notRecognized = "NR";
 String response_accepted = "A";
 String response_error = "E";
 
+// Default settings
 unsigned int settingA = 5;
 unsigned int settingB = 5;
 
@@ -43,7 +44,7 @@ void settingA_handler(String arg1, String arg2) {
     }    
   }
 
-  // If there isn't an argument, then we're getting
+  // If there isn't an argument, then we're getting the value
   else {
     Serial.println(String(settingA));
   }
@@ -64,7 +65,7 @@ void settingB_handler(String arg1, String arg2) {
     }    
   }
 
-  // If there isn't an argument, then we're getting
+  // If there isn't an argument, then we're getting the value
   else {
     Serial.println(String(settingB));
   }
@@ -72,39 +73,36 @@ void settingB_handler(String arg1, String arg2) {
 
 void taskA_handler() {
 
-  Serial.println("TaskA");
-  Serial.println(stateNames[task]);  
-
-  if (task == IDLE)
+  // Toggle
+  if (task != TASK_A)
     task = TASK_A;
   else 
     task = IDLE; 
   
+  // Debug print
   Serial.println(stateNames[task]);
 }
 
 void taskB_handler() {
-  Serial.println("TaskB");
-  Serial.println(stateNames[task]);  
 
-  if (task == IDLE)
+  // Toggle
+  if (task != TASK_B)
     task = TASK_B;
   else 
     task = IDLE; 
   
+  // Debug print
   Serial.println(stateNames[task]);
 }
 
-void processPacket() {
-
-  // Retrieve our command
+void processPacket() {  
   String command, arg1, arg2;
 
-  command = strtok(buffer,commandDelimiter);
-  arg1 = strtok(NULL,commandDelimiter);
-  arg2 = strtok(NULL,commandDelimiter);
+  command = strtok(buffer,commandDelimiter);  // Retrieve our command.
+  arg1 = strtok(NULL,commandDelimiter);       // Add more strtok commands 
+  arg2 = strtok(NULL,commandDelimiter);       // if more arguments are needed
 
-  // Look for our stock commands
+  // Look for our commands
   if (command.equalsIgnoreCase(command_firmwareVersion)) {
     Serial.println(firmwareVersion);
   } 
@@ -129,11 +127,12 @@ void processPacket() {
   else {
     Serial.println(response_notRecognized);
   }
-
-  // Reset our buffer
-  bufferIndex = 0;
+  
+  bufferIndex = 0; // Reset our buffer
 }
 
+// Add incoming serial to our buffer, 
+// raise a flag when the EOL character is found
 void processIncomingSerial() {
   unsigned char incomingByte;
 
@@ -144,14 +143,33 @@ void processIncomingSerial() {
     if (incomingByte == delimiter) {
       packetDetected = 1;
       buffer[bufferIndex] = 0x00;
-    }
-      
+    }      
 
     bufferIndex ++;
   }
 }
 
-// Setup Hardware
+// Our state machine to process our tasks. 
+// Typically this would be called based on some timer.
+void processTasks() {
+  switch(task){
+    case TASK_A:
+      // perform taskA funcitons     
+      // Serial.println("TaskA");
+      // delay(100);
+      return;
+    case TASK_B:
+      // perform taskB funcitons      
+      // Serial.println("TaskB");
+      // delay(100);
+      return;
+    default:
+      // default state should be idle
+      return;
+  }
+}
+
+// Setup our hardware
 void setup() {
   task = IDLE;  
   Serial.begin(115200);
@@ -164,4 +182,5 @@ void loop(){
     packetDetected = 0;
     processPacket();
   }
+  processTasks();
 }
