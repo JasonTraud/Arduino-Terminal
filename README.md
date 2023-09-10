@@ -1,16 +1,19 @@
 # Arduino-Terminal
+
+[Read Detailed Blog Post](https://oshgarage.com/arduino-console/)
+
 Basic terminal example implemented on an Arduino. Get and set various registers through any terminal program such as RealTerm or TerraTerm. Baud rate is set to 115,200.
 
-Adds incoming data over the USB serial port to a buffer and watches for a carriage return to determine when to process the information. 
+Adds incoming data over the USB serial port to a buffer and watches for a carriage return to determine when to process the information. Commands are not case sensitive and are as follows.
 
-- **ver**: prints the firmware version to the console
-- **settingA**: First settings register. Accepts one argument between 0 and 10. 
-- **settingB**: Second settings register. Accepts one argument between 0 and 10. 
-- **TaskA**: First task
-- **TaskB**: Second task
+- **Ver**: Prints the firmware version to the console.
+- **SettingA**: First settings register. Accepts int between 0 and 10. 
+- **SettingB**: Second settings register. Accepts int between 0 and 10. 
+- **TaskA**: Execute function TaskA. 
+- **TaskB**: Execute function TaskB.
 
 ## Settings
-No argugument being sent is a GET command. Which means that the Arduino will respond to the terminal with whatever value is currently in memory for that setting. 
+No argument being sent is a GET command. Which means that the Arduino will respond to the terminal with whatever value is currently in memory for that setting. 
 
 One argument for the setting will overwrite the current value and print one of the responses below. 
 - **NR**: Not Recognized
