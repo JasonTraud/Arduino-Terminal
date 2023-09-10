@@ -23,6 +23,11 @@ String response_error = "E";
 unsigned int settingA = 5;
 unsigned int settingB = 5;
 
+// Our list of tasks
+enum Tasks { IDLE, TASK_A, TASK_B } task;
+#define IDNAME(name) #name
+const char* stateNames[] = {IDNAME(IDLE), IDNAME(TASK_A), IDNAME(TASK_B)};
+
 void settingA_handler(String arg1, String arg2) {
   unsigned int temp_settingA = settingA;
   
@@ -66,11 +71,28 @@ void settingB_handler(String arg1, String arg2) {
 }
 
 void taskA_handler() {
+
   Serial.println("TaskA");
+  Serial.println(stateNames[task]);  
+
+  if (task == IDLE)
+    task = TASK_A;
+  else 
+    task = IDLE; 
+  
+  Serial.println(stateNames[task]);
 }
 
 void taskB_handler() {
   Serial.println("TaskB");
+  Serial.println(stateNames[task]);  
+
+  if (task == IDLE)
+    task = TASK_B;
+  else 
+    task = IDLE; 
+  
+  Serial.println(stateNames[task]);
 }
 
 void processPacket() {
@@ -131,6 +153,7 @@ void processIncomingSerial() {
 
 // Setup Hardware
 void setup() {
+  task = IDLE;  
   Serial.begin(115200);
 }
 
